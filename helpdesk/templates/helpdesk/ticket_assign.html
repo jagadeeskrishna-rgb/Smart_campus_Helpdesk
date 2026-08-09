@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel">
+  <h1 class="h3 mb-3">Assign {{ ticket.ticket_number }}</h1>
+  <form method="post" class="vstack gap-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary align-self-start">Assign</button>
+  </form>
+</div>
+{% endblock %}

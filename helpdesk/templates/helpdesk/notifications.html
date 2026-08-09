@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel">
+  <h1 class="h3 mb-3">Notifications</h1>
+  {% for item in notifications %}<p><a href="{{ item.ticket.get_absolute_url }}">{{ item.message }}</a><br><span class="text-muted small">{{ item.created_at }}</span></p>{% empty %}<p class="text-muted">No notifications.</p>{% endfor %}
+</div>
+{% endblock %}

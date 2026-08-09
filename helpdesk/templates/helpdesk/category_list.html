@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between mb-3"><h1 class="h3">Service Categories</h1><a class="btn btn-primary" href="{% url 'category_create' %}">Add Category</a></div>
+<div class="panel table-responsive">
+  <table class="table"><thead><tr><th>Name</th><th>Description</th><th>Active</th><th>Tickets</th></tr></thead><tbody>
+  {% for category in categories %}<tr><td>{{ category.name }}</td><td>{{ category.description }}</td><td>{{ category.is_active }}</td><td>{{ category.ticket_count }}</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div>
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <p class="text-muted mb-0">Role: {{ role|title }}</p>
+  </div>
+  <a href="{% url 'ticket_create' %}" class="btn btn-primary">Create Ticket</a>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-md"><div class="metric"><span>Total</span><strong>{{ total_tickets }}</strong></div></div>
+  <div class="col-md"><div class="metric"><span>New</span><strong>{{ new_tickets }}</strong></div></div>
+  <div class="col-md"><div class="metric"><span>In Progress</span><strong>{{ in_progress_tickets }}</strong></div></div>
+  <div class="col-md"><div class="metric"><span>Resolved</span><strong>{{ resolved_tickets }}</strong></div></div>
+  <div class="col-md"><div class="metric"><span>Closed</span><strong>{{ closed_tickets }}</strong></div></div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="panel">
+      <h2 class="h5">Recent Tickets</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>No.</th><th>Title</th><th>Status</th><th>Priority</th></tr></thead>
+          <tbody>
+          {% for ticket in recent_tickets %}
+          <tr>
+            <td><a href="{{ ticket.get_absolute_url }}">{{ ticket.ticket_number }}</a></td>
+            <td>{{ ticket.title }}</td>
+            <td><span class="badge status">{{ ticket.get_status_display }}</span></td>
+            <td>{{ ticket.get_priority_display }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-muted">No tickets found.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="panel">
+      <h2 class="h5">Status Summary</h2>
+      {{ status_counts|json_script:"status-data" }}
+      <canvas id="statusChart" height="220"></canvas>
+    </div>
+  </div>
+</div>
+{% endblock %}

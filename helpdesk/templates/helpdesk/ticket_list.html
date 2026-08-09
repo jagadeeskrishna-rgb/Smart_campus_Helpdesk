@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Tickets</h1>
+  <a href="{% url 'ticket_create' %}" class="btn btn-primary">Create Ticket</a>
+</div>
+<form class="panel row g-2 mb-3" method="get">
+  <div class="col-md-4"><input class="form-control" name="q" value="{{ filters.q }}" placeholder="Search ticket, title, or location"></div>
+  <div class="col-md-2"><select class="form-select" name="status"><option value="">All status</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><select class="form-select" name="priority"><option value="">All priority</option>{% for value,label in priority_choices %}<option value="{{ value }}" {% if filters.priority == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-3"><select class="form-select" name="category"><option value="">All categories</option>{% for category in categories %}<option value="{{ category.id }}" {% if filters.category == category.id|stringformat:'s' %}selected{% endif %}>{{ category.name }}</option>{% endfor %}</select></div>
+  <div class="col-md-1"><button class="btn btn-outline-primary w-100">Go</button></div>
+</form>
+<div class="panel table-responsive">
+  <table class="table align-middle">
+    <thead><tr><th>Ticket</th><th>Issue</th><th>Category</th><th>Status</th><th>Priority</th><th>Assigned</th></tr></thead>
+    <tbody>
+    {% for ticket in page_obj %}
+    <tr>
+      <td><a href="{{ ticket.get_absolute_url }}">{{ ticket.ticket_number }}</a></td>
+      <td>{{ ticket.title }}<div class="small text-muted">{{ ticket.location }}</div></td>
+      <td>{{ ticket.category.name }}</td>
+      <td><span class="badge status">{{ ticket.get_status_display }}</span></td>
+      <td>{{ ticket.get_priority_display }}</td>
+      <td>{{ ticket.assigned_to|default:"Unassigned" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" class="text-muted">No matching tickets.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

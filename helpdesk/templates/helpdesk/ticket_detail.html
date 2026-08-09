@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h3">{{ ticket.ticket_number }} - {{ ticket.title }}</h1>
+    <p class="text-muted">{{ ticket.category.name }} | {{ ticket.location }} | {{ ticket.get_priority_display }}</p>
+  </div>
+  <span class="badge text-bg-primary fs-6">{{ ticket.get_status_display }}</span>
+</div>
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="panel mb-3">
+      <h2 class="h5">Issue Details</h2>
+      <p>{{ ticket.description }}</p>
+      {% if ticket.resolution_notes %}<div class="alert alert-success">{{ ticket.resolution_notes }}</div>{% endif %}
+      {% if role == 'admin' %}<a href="{% url 'ticket_assign' ticket.pk %}" class="btn btn-outline-primary btn-sm">Assign Ticket</a>{% endif %}
+      {% if role == 'admin' or role == 'technician' %}
+      <form method="post" action="{% url 'ticket_status_update' ticket.pk %}" class="row g-2 mt-2">
+        {% csrf_token %}
+        <div class="col-md-4"><select name="status" class="form-select">{% for value,label in ticket.Status.choices %}<option value="{{ value }}" {% if ticket.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+        <div class="col-md-6"><input name="resolution_notes" class="form-control" placeholder="Notes" value="{{ ticket.resolution_notes }}"></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Update</button></div>
+      </form>
+      {% endif %}
+      {% if role == 'student' and ticket.status == 'resolved' %}<a class="btn btn-success btn-sm mt-2" href="{% url 'close_ticket' ticket.pk %}">Close Ticket</a>{% endif %}
+      {% if role == 'student' and ticket.status == 'closed' %}<a class="btn btn-warning btn-sm mt-2" href="{% url 'reopen_ticket' ticket.pk %}">Reopen Ticket</a>{% endif %}
+    </div>
+    <div class="panel">
+      <h2 class="h5">Comments</h2>
+      {% for comment in ticket.comments.all %}
+      <div class="comment"><strong>{{ comment.author.username }}</strong><span class="text-muted small"> {{ comment.created_at }}</span><p>{{ comment.message }}</p></div>
+      {% empty %}<p class="text-muted">No comments yet.</p>{% endfor %}
+      <form method="post" class="mt-3">
+        {% csrf_token %}<input type="hidden" name="action" value="comment">{{ comment_form.as_p }}<button class="btn btn-outline-primary">Add Comment</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="panel mb-3">
+      <h2 class="h5">Attachments</h2>
+      {% for attachment in ticket.attachments.all %}<p><a href="{{ attachment.file.url }}">{{ attachment.file.name }}</a></p>{% empty %}<p class="text-muted">No attachments.</p>{% endfor %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}<input type="hidden" name="action" value="attachment">{{ attachment_form.as_p }}<button class="btn btn-outline-secondary btn-sm">Upload</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h2 class="h5">History</h2>
+      {% for item in ticket.history.all %}<p class="small"><strong>{{ item.created_at }}</strong><br>{{ item.note }}</p>{% empty %}<p class="text-muted">No history recorded.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
